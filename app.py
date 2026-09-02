@@ -61,7 +61,7 @@ You can switch naturally between helpful mode and playful roast mode.
 # -----------------------------
 st.markdown('<div class="main-title">🤖 Danish AI</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="subtitle">Your AI assistant • English + اردو • Roast Mode 🔥</div>',
+    '<div class="subtitle">Your AI assistant  🔥</div>',
     unsafe_allow_html=True
 )
 
