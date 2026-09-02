@@ -1,75 +1,121 @@
 import streamlit as st
-from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
-
-client = OpenAI()
-
+# -----------------------------
+# Page settings
+# -----------------------------
 st.set_page_config(
-    page_title="Danish_AI",
+    page_title="Danish AI",
     page_icon="🤖",
     layout="centered"
 )
 
-st.title("🤖 Danish_AI")
-st.caption("Your personal AI assistant.")
+# -----------------------------
+# OpenAI connection
+# -----------------------------
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-st.info("👋 Hello! I am Danish_AI. Ask me anything!")
+# -----------------------------
+# Danish AI personality
+# -----------------------------
+SYSTEM_PROMPT = """
+You are Danish AI, a friendly and intelligent AI assistant.
 
-if "conversation" not in st.session_state:
-    st.session_state.conversation = []
+Normally:
+- Answer questions clearly and helpfully.
+- Be friendly and conversational.
+- You can speak English or Urdu depending on the user's language.
 
-if st.button("🧹 Clear Chat"):
-    st.session_state.conversation = []
-    st.rerun()
+Roast mode:
+- If the user asks you to roast them, tease them, or says "roast me",
+  give a funny playful roast.
+- Keep roasts humorous and harmless.
+- Never use hateful, threatening, or seriously abusive language.
 
-for message in st.session_state.conversation:
+You can switch naturally between helpful mode and playful roast mode.
+"""
 
-    if message["role"] == "user":
-        with st.chat_message("user"):
-            st.write(message["content"])
+# -----------------------------
+# Title
+# -----------------------------
+st.title("🤖 Danish AI")
+st.caption("Your AI assistant • English + اردو • Roast Mode 🔥")
 
-    else:
-        with st.chat_message("assistant", avatar="🤖"):
-            st.write(message["content"])
+# -----------------------------
+# Chat history
+# -----------------------------
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {
+            "role": "system",
+            "content": SYSTEM_PROMPT
+        }
+    ]
 
-message = st.chat_input("💬 Type your message...")
+# Display previous messages
+for message in st.session_state.messages:
+    if message["role"] == "system":
+        continue
 
-if message:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-    st.session_state.conversation.append({
-        "role": "user",
-        "content": message
-    })
+# -----------------------------
+# User input
+# -----------------------------
+user_input = st.chat_input("Ask Danish AI anything...")
+
+if user_input:
+
+    # Add user message
+    st.session_state.messages.append(
+        {
+            "role": "user",
+            "content": user_input
+        }
+    )
 
     with st.chat_message("user"):
-        st.write(message)
+        st.markdown(user_input)
 
-    with st.chat_message("assistant", avatar="🤖"):
+    # Get AI response
+    with st.chat_message("assistant"):
+        with st.spinner("Danish AI is thinking... 🤔"):
 
-        response = client.responses.create(
-            model="gpt-5.6-luna",
-            instructions="""
-You are Danish_AI, a friendly and funny AI assistant.
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=st.session_state.messages
+            )
 
-Your personality:
-- Be friendly and helpful.
-- Use simple language.
-- Understand English, Urdu, and Roman Urdu.
-- Be funny when appropriate.
-- If the user asks for a roast, give a playful roast.
-- Do not use hateful or harmful insults.
-- Keep normal answers clear and useful.
-""",
-            input=st.session_state.conversation
-        )
+            answer = response.choices[0].message.content
 
-        answer = response.output_text
+            st.markdown(answer)
 
-        st.write(answer)
+    # Save AI response
+    st.session_state.messages.append(
+        {
+            "role": "assistant",
+            "content": answer
+        }
+    )
 
-    st.session_state.conversation.append({
-        "role": "assistant",
-        "content": answer
-    })
+# -----------------------------
+# Sidebar
+# -----------------------------
+with st.sidebar:
+    st.header("⚙️ Danish AI")
+
+    st.write("### Features")
+    st.write("💬 AI Chat")
+    st.write("🇵🇰 Urdu + English")
+    st.write("🔥 Roast Mode")
+    st.write("🧠 Conversation Memory")
+
+    if st.button("🗑️ Clear Chat"):
+        st.session_state.messages = [
+            {
+                "role": "system",
+                "content": SYSTEM_PROMPT
+            }
+        ]
+        st.rerun()
