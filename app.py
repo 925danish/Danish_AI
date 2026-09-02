@@ -9,6 +9,27 @@ st.set_page_config(
     page_icon="🤖",
     layout="centered"
 )
+st.markdown("""
+<style>
+    .main-title {
+        text-align: center;
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .subtitle {
+        text-align: center;
+        font-size: 16px;
+        opacity: 0.7;
+        margin-bottom: 30px;
+    }
+
+    .stChatMessage {
+        border-radius: 15px;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # OpenAI connection
@@ -38,8 +59,11 @@ You can switch naturally between helpful mode and playful roast mode.
 # -----------------------------
 # Title
 # -----------------------------
-st.title("🤖 Danish AI")
-st.caption("Your AI assistant • English + اردو • Roast Mode 🔥")
+st.markdown('<div class="main-title">🤖 Danish AI</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="subtitle">Your AI assistant • English + اردو • Roast Mode 🔥</div>',
+    unsafe_allow_html=True
+)
 
 # -----------------------------
 # Chat history
