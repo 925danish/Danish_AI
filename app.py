@@ -5,7 +5,7 @@ from openai import OpenAI
 # Page settings
 # -----------------------------
 st.set_page_config(
-    st.markdown("""
+    st.markdown(
 <style>
 .stApp {
     background: linear-gradient(135deg, #0f172a, #312e81, #581c87);
