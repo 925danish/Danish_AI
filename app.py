@@ -5,30 +5,7 @@ from openai import OpenAI
 # Page settings
 # -----------------------------
 st.set_page_config(
-    st.markdown(
-<style>
-.stApp {
-    background: linear-gradient(135deg, #0f172a, #312e81, #581c87);
-}
-
-h1 {
-    color: #c084fc;
-}
-
-.stCaption {
-    color: #e9d5ff;
-}
-
-[data-testid="stChatMessage"] {
-    border-radius: 15px;
-    border: 1px solid #7c3aed;
-}
-
-.stChatInput {
-    border-color: #8b5cf6;
-}
-</style>
-""", unsafe_allow_html=True)
+   
     page_title="Danish AI",
     page_icon="🤖",
     layout="centered"
