@@ -8,8 +8,8 @@ st.set_page_config(
     page_icon="🤖",
     layout="Wide"
 )
-st.title(Danish_AI")
-st.caption("Your inyellegent AI Assistant")
+st.title("Danish_AI")
+st.caption("Your intellegent AI Assistant")
 st.markdown("""
 <style>
     .main-title {
