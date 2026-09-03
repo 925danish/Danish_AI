@@ -139,8 +139,8 @@ css = f"""
     padding:18px;min-height:120px;
 }}
 .stat-icon{{
-    width:36px;height:36px;border-radius:9px;
-    display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:12px;
+    width:8px;height:8px;border-radius:50%;
+    margin-bottom:14px;
 }}
 .stat-number{{font-size:24px;font-weight:600;margin:2px 0;color:{T['text']};}}
 .stat-label{{font-size:13px;font-weight:600;color:{T['text']};}}
@@ -153,8 +153,8 @@ css = f"""
 .chat-panel-head{{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}}
 .chat-panel-title{{display:flex;align-items:center;gap:11px;}}
 .chat-icon-badge{{
-    width:34px;height:34px;border-radius:9px;background:{T['accent_soft_bg']};
-    display:flex;align-items:center;justify-content:center;font-size:16px;
+    width:32px;height:32px;border-radius:8px;background:{T['accent_soft_bg']};
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:{T['accent_soft_fg']};
 }}
 .chat-title-text{{font-size:17px;font-weight:600;color:{T['text']};}}
 .chat-sub-text{{font-size:12px;color:{T['text_muted']};margin-top:1px;}}
@@ -162,10 +162,11 @@ css = f"""
 .msg-row{{display:flex;gap:10px;margin-bottom:14px;align-items:flex-end;}}
 .msg-row.user{{flex-direction:row-reverse;}}
 .avatar{{
-    width:30px;height:30px;border-radius:50%;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;font-size:14px;background:{T['avatar_bg']};
+    width:28px;height:28px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;
+    background:{T['avatar_bg']};color:{T['text_soft']};
 }}
-.avatar.user{{background:{T['accent_soft_bg']};}}
+.avatar.user{{background:{T['accent_soft_bg']};color:{T['accent_soft_fg']};}}
 .bubble{{max-width:65%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.5;}}
 .bubble.user{{background:{T['accent']};color:#fff;border-bottom-right-radius:4px;}}
 .bubble.bot{{background:{T['bot_bubble']};color:{T['text']};border-bottom-left-radius:4px;}}
@@ -244,7 +245,7 @@ SPARK_D = [0.35, 0.6, 0.3, 0.55, 0.4, 0.65, 0.5]
 with st.sidebar:
     st.markdown(
         "<div class='brand-row'>"
-        "<div class='brand-logo'>🤖</div>"
+        "<div class='brand-logo'>D</div>"
         "<div><div class='brand'>Danish AI</div></div>"
         "</div>"
         "<div class='tagline'>Your intelligent AI assistant</div>",
@@ -252,24 +253,24 @@ with st.sidebar:
     )
 
     pages = ["AI Chat", "Dashboard", "Usage & Stats", "Settings"]
-    icons = {"AI Chat": "💬", "Dashboard": "🏠", "Usage & Stats": "📶", "Settings": "⚙️"}
+    icons = {"AI Chat": "", "Dashboard": "", "Usage & Stats": "", "Settings": ""}
 
     for p in pages:
         selected = st.session_state.page == p
-        if st.button(f"{icons[p]}  {p}", key=f"nav_{p}", use_container_width=True,
+        if st.button(p, key=f"nav_{p}", use_container_width=True,
                      type="primary" if selected else "secondary"):
             st.session_state.page = p
             st.rerun()
 
     st.markdown("<div class='nav-label'>CHAT</div>", unsafe_allow_html=True)
 
-    if st.button("🗑️  Clear conversation", use_container_width=True):
+    if st.button("Clear conversation", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
 
     st.markdown(
         "<div class='pro-card'>"
-        "<div class='pro-title'>👑 Danish AI Premium</div>"
+        "<div class='pro-title'>Danish AI Premium</div>"
         "<div class='pro-text'>Unlock more power and exclusive features.</div>"
         "</div>",
         unsafe_allow_html=True
@@ -303,26 +304,19 @@ with st.sidebar:
 # HEADER
 # ============================================================
 
-def greeting_word():
-    h = datetime.now().hour
-    if h < 12:
-        return "Good morning"
-    if h < 17:
-        return "Good afternoon"
-    return "Good evening"
-
-
 def render_header(subtitle):
     now = datetime.now()
+    date_str = f"{now.strftime('%B')} {now.day}, {now.year}"
+    time_str = now.strftime("%I:%M %p")
     st.markdown(
         "<div class='greeting-row'>"
         "<div>"
-        f"<div class='greeting-title'>{greeting_word()}, "
-        f"<span class='greeting-accent'>{st.session_state.user_name}</span> 👋</div>"
+        f"<div class='greeting-title'>Welcome back, "
+        f"<span class='greeting-accent'>{st.session_state.user_name}</span></div>"
         f"<div class='greeting-sub'>{subtitle}</div>"
         "</div>"
-        "<div class='date-card'>📅 " + now.strftime("%B %-d, %Y") +
-        f"<div class='time'>{now.strftime('%-I:%M %p')}</div></div>"
+        f"<div class='date-card'>{date_str}"
+        f"<div class='time'>{time_str}</div></div>"
         "</div>",
         unsafe_allow_html=True
     )
@@ -334,20 +328,20 @@ def render_header(subtitle):
 def render_stat_cards():
     col1, col2, col3, col4 = st.columns(4)
     cards = [
-        (col1, "💬", T["accent_soft_bg"], T["accent_soft_fg"], str(st.session_state.total_messages),
+        (col1, "", T["accent_soft_bg"], T["accent_soft_fg"], str(st.session_state.total_messages),
          "Messages", "Total messages", SPARK_A, T["accent"]),
-        (col2, "🙋", T["accent_soft_bg"], T["accent_soft_fg"], str(st.session_state.questions_asked),
+        (col2, "", T["accent_soft_bg"], T["accent_soft_fg"], str(st.session_state.questions_asked),
          "Questions", "Asked by you", SPARK_B, T["accent"]),
-        (col3, "🤖", T["green_bg"], T["green_fg"], str(st.session_state.ai_responses),
+        (col3, "", T["green_bg"], T["green_fg"], str(st.session_state.ai_responses),
          "AI responses", "From Danish AI", SPARK_C, T["green_fg"]),
-        (col4, "🔥", T["amber_bg"], T["amber_fg"], str(st.session_state.roast_count),
+        (col4, "", T["amber_bg"], T["amber_fg"], str(st.session_state.roast_count),
          "Roast mode", "Funny roasts", SPARK_D, T["amber_fg"]),
     ]
     for col, icon, bg, fg, number, label, sub, spark, spark_color in cards:
         with col:
             st.markdown(
                 "<div class='stat-card'>"
-                f"<div class='stat-icon' style='background:{bg};color:{fg};'>{icon}</div>"
+                f"<div class='stat-icon' style='background:{fg};'></div>"
                 f"<div class='stat-number'>{number}</div>"
                 f"<div class='stat-label'>{label}</div>"
                 f"<div class='stat-sub'>{sub}</div>"
@@ -366,17 +360,17 @@ def render_messages(messages):
         if role == "user":
             st.markdown(
                 "<div class='msg-row user'>"
-                "<div class='avatar user'>🙂</div>"
+                "<div class='avatar user'>U</div>"
                 "<div>"
                 f"<div class='bubble user'>{m['content']}</div>"
-                f"<div class='msg-time'>{ts} ✓</div>"
+                f"<div class='msg-time'>{ts}</div>"
                 "</div></div>",
                 unsafe_allow_html=True
             )
         else:
             st.markdown(
                 "<div class='msg-row'>"
-                "<div class='avatar'>🤖</div>"
+                "<div class='avatar'>AI</div>"
                 "<div>"
                 f"<div class='bubble bot'>{m['content']}</div>"
                 f"<div class='msg-time'>{ts}</div>"
@@ -387,7 +381,7 @@ def render_messages(messages):
 
 def get_ai_reply(history, system_prompt):
     if client is None:
-        return "⚠️ OpenAI is not connected. Please check your OPENAI_API_KEY in Streamlit Secrets."
+        return "OpenAI is not connected. Please check your OPENAI_API_KEY in Streamlit Secrets."
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -396,7 +390,7 @@ def get_ai_reply(history, system_prompt):
         )
         return response.choices[0].message.content
     except Exception as error:
-        return "⚠️ Something went wrong while contacting the AI.\n\n" + str(error)
+        return "Something went wrong while contacting the AI.\n\n" + str(error)
 
 # ============================================================
 # AI CHAT PAGE (default landing page)
@@ -410,7 +404,7 @@ if st.session_state.page == "AI Chat":
         "<div class='chat-panel'>"
         "<div class='chat-panel-head'>"
         "<div class='chat-panel-title'>"
-        "<div class='chat-icon-badge'>💬</div>"
+        "<div class='chat-icon-badge'>AI</div>"
         "<div><div class='chat-title-text'>AI chat</div>"
         "<div class='chat-sub-text'>Talk with Danish AI.</div></div>"
         "</div></div>",
@@ -429,13 +423,13 @@ if st.session_state.page == "AI Chat":
 
     render_messages(st.session_state.messages)
 
-    roast_toggle = st.toggle("⚡ Roast mode", value=st.session_state.roast_mode)
+    roast_toggle = st.toggle("Roast mode", value=st.session_state.roast_mode)
     st.session_state.roast_mode = roast_toggle
 
     user_input = st.chat_input("Type your message...")
 
     if user_input:
-        now_str = datetime.now().strftime("%-I:%M %p")
+        now_str = datetime.now().strftime("%I:%M %p")
         st.session_state.messages.append({"role": "user", "content": user_input, "time": now_str})
         st.session_state.total_messages += 1
         st.session_state.questions_asked += 1
@@ -443,7 +437,7 @@ if st.session_state.page == "AI Chat":
         prompt = ROAST_PROMPT if st.session_state.roast_mode else NORMAL_PROMPT
         answer = get_ai_reply(st.session_state.messages, prompt)
 
-        reply_time = datetime.now().strftime("%-I:%M %p")
+        reply_time = datetime.now().strftime("%I:%M %p")
         st.session_state.messages.append({"role": "assistant", "content": answer, "time": reply_time})
         st.session_state.total_messages += 1
         st.session_state.ai_responses += 1
@@ -467,7 +461,7 @@ elif st.session_state.page == "Dashboard":
         "<div class='chat-panel'>"
         "<div class='chat-panel-head'>"
         "<div class='chat-panel-title'>"
-        "<div class='chat-icon-badge'>💬</div>"
+        "<div class='chat-icon-badge'>AI</div>"
         "<div><div class='chat-title-text'>AI chat</div>"
         "<div class='chat-sub-text'>Talk with Danish AI.</div></div>"
         "</div></div>",
@@ -493,11 +487,11 @@ elif st.session_state.page == "Dashboard":
 
 elif st.session_state.page == "Usage & Stats":
 
-    st.markdown("<div class='section-title'>📶 Usage & stats</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title'>Usage & stats</div>", unsafe_allow_html=True)
     render_stat_cards()
     st.markdown("")
     st.info(
-        "💡 Stats are currently session-based. Later we can add user accounts, "
+        "Stats are currently session-based. Later we can add user accounts, "
         "permanent usage statistics and analytics."
     )
 
@@ -507,7 +501,7 @@ elif st.session_state.page == "Usage & Stats":
 
 elif st.session_state.page == "Settings":
 
-    st.markdown("<div class='section-title'>⚙️ Settings</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title'>Settings</div>", unsafe_allow_html=True)
 
     st.markdown(
         "<div class='welcome-card'>"
