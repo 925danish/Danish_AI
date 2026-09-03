@@ -10,28 +10,40 @@ st.title("Danish_AI")
 st.caption("Your intelligent AI Assistant")
 st.markdown("""
 <style>
-    .main-title {
-        text-align: center;
-        font-size: 42px;
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
 
-    .subtitle {
-        text-align: center;
-        font-size: 16px;
-        opacity: 0.7;
-        margin-bottom: 30px;
-    }
+.main-title {
+    text-align: center;
+    font-size: 46px;
+    font-weight: 800;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
 
-    .stChatMessage {
-        border-radius: 15px;
-        padding: 10px;
-        margin-bottom: 8px;
-    }
+.subtitle {
+    text-align: center;
+    font-size: 17px;
+    opacity: 0.75;
+    margin-bottom: 30px;
+}
+
+.stChatMessage {
+    border-radius: 18px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.stChatInputContainer {
+    border-radius: 20px;
+}
+
+section[data-testid="stSidebar"] {
+    padding-top: 20px;
+}
+
 </style>
 """, unsafe_allow_html=True)
-
+    
+       
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 
