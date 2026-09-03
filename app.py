@@ -121,7 +121,7 @@ with st.sidebar:
     st.write("### Features")
     st.write("💬 AI Chat")
     st.write("🇵🇰 Urdu + English")
-     st.write("🧠 Conversation Memory")
+    st.write("🧠 Conversation Memory")
 
     if st.button("🗑️ Clear Chat"):
         st.session_state.messages = [
