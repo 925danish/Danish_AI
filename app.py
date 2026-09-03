@@ -3,9 +3,9 @@ from openai import OpenAI
 from datetime import datetime
 
 
-# ============================================================
-# PAGE CONFIG
-# ============================================================
+# =========================================================
+# PAGE
+# =========================================================
 
 st.set_page_config(
     page_title="Danish AI",
@@ -15,36 +15,36 @@ st.set_page_config(
 )
 
 
-# ============================================================
+# =========================================================
 # OPENAI
-# ============================================================
+# =========================================================
 
 client = OpenAI(
     api_key=st.secrets["OPENAI_API_KEY"]
 )
 
 
-# ============================================================
-# SYSTEM PROMPT
-# ============================================================
+# =========================================================
+# AI SYSTEM PROMPT
+# =========================================================
 
 SYSTEM_PROMPT = """
-You are Danish AI, a friendly, intelligent AI assistant.
+You are Danish AI, a friendly and intelligent AI assistant.
 
-Answer questions clearly and helpfully.
+Answer clearly and helpfully.
 
-You can communicate in English or Urdu depending on the user's language.
+You can speak English or Urdu depending on the user's language.
 
-If the user asks for a roast or says "roast me":
+If the user asks "roast me" or asks for a roast,
 give a funny, playful and harmless roast.
 
 Never use hateful, threatening or seriously abusive language.
 """
 
 
-# ============================================================
+# =========================================================
 # SESSION STATE
-# ============================================================
+# =========================================================
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
@@ -57,58 +57,58 @@ if "messages" not in st.session_state:
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
 
+if "roast_mode" not in st.session_state:
+    st.session_state.roast_mode = False
 
-# ============================================================
-# COUNTERS
-# ============================================================
 
-user_messages = len(
-    [
-        m for m in st.session_state.messages
-        if m["role"] == "user"
-    ]
+# =========================================================
+# STATISTICS
+# =========================================================
+
+user_messages = sum(
+    1 for message in st.session_state.messages
+    if message["role"] == "user"
 )
 
-assistant_messages = len(
-    [
-        m for m in st.session_state.messages
-        if m["role"] == "assistant"
-    ]
+ai_messages = sum(
+    1 for message in st.session_state.messages
+    if message["role"] == "assistant"
 )
 
-total_messages = user_messages + assistant_messages
+total_messages = user_messages + ai_messages
 
 
-# ============================================================
-# CUSTOM CSS
-# ============================================================
+# =========================================================
+# CUSTOM DESIGN
+# =========================================================
 
-css = """
+st.markdown(
+    """
 <style>
 
-/* =========================================================
-   GLOBAL
-   ========================================================= */
+/* ========================================================
+   MAIN APP
+   ======================================================== */
 
 .stApp {
-    background: #070c1d;
+    background: #070b1c;
     color: #ffffff;
 }
 
 .main {
-    background: #070c1d;
+    background: #070b1c;
 }
 
 .block-container {
-    max-width: 1400px;
+    max-width: 1500px;
     padding-top: 35px;
-    padding-left: 34px;
-    padding-right: 34px;
-    padding-bottom: 25px;
+    padding-left: 35px;
+    padding-right: 35px;
+    padding-bottom: 30px;
 }
 
 
-/* Hide Streamlit branding */
+/* Remove Streamlit branding */
 
 #MainMenu {
     visibility: hidden;
@@ -127,72 +127,64 @@ footer {
 }
 
 
-/* =========================================================
+/* ========================================================
    SIDEBAR
-   ========================================================= */
+   ======================================================== */
 
 [data-testid="stSidebar"] {
     background: #080d20;
-    border-right: 1px solid #202942;
+    border-right: 1px solid #202943;
     min-width: 275px;
     max-width: 275px;
 }
 
 [data-testid="stSidebar"] > div {
-    padding: 24px 20px;
+    padding: 25px 20px;
 }
 
 
 /* Brand */
 
-.brand-container {
+.brand {
     display: flex;
     align-items: center;
     gap: 13px;
-    padding: 4px 4px 28px 4px;
+    margin-bottom: 32px;
 }
 
 .brand-logo {
-    width: 53px;
-    height: 53px;
-    min-width: 53px;
+    width: 55px;
+    height: 55px;
     border-radius: 17px;
-    background: linear-gradient(
-        135deg,
-        #8b3dff,
-        #6425d7
-    );
+    background: linear-gradient(135deg, #9b45ff, #5d21d6);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 29px;
-    box-shadow:
-        0 0 22px rgba(124, 58, 237, 0.30);
+    box-shadow: 0 0 25px rgba(132, 48, 255, 0.35);
 }
 
-.brand-name {
-    color: #f4f3ff;
-    font-size: 23px;
+.brand-title {
+    font-size: 22px;
     font-weight: 800;
-    line-height: 1.1;
+    color: #f5f3ff;
 }
 
 .brand-subtitle {
-    color: #8d96aa;
+    color: #818ba1;
     font-size: 10px;
-    margin-top: 5px;
+    margin-top: 4px;
 }
 
 
-/* Sidebar labels */
+/* Sidebar heading */
 
-.sidebar-label {
-    color: #6e7890;
+.sidebar-heading {
+    color: #68738b;
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    margin-top: 13px;
-    margin-bottom: 10px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+    margin-bottom: 9px;
 }
 
 
@@ -202,141 +194,108 @@ footer {
     margin-bottom: 5px;
 }
 
-[data-testid="stSidebar"] .stButton > button {
+[data-testid="stSidebar"] .stButton button {
     width: 100%;
-    height: 44px;
+    height: 43px;
     border-radius: 10px;
-    border: 1px solid transparent;
     background: transparent;
-    color: #cbd2e1;
+    color: #cbd1df;
+    border: 1px solid transparent;
     text-align: left;
     font-size: 13px;
     font-weight: 600;
-    padding-left: 15px;
-    transition: all 0.2s ease;
+    transition: 0.2s;
 }
 
-[data-testid="stSidebar"] .stButton > button:hover {
-    background: #19112e;
-    border-color: #432575;
-    color: #ffffff;
+[data-testid="stSidebar"] .stButton button:hover {
+    background: #21123c;
+    border-color: #51248b;
+    color: white;
 }
 
 
-/* Sidebar separator */
+/* Sidebar divider */
 
-.sidebar-line {
+.divider {
     height: 1px;
-    background: #202942;
-    margin: 23px 0 18px 0;
+    background: #202943;
+    margin: 22px 0 18px 0;
 }
 
 
-/* Clear button */
+/* Premium */
 
-.clear-button {
-    border: 1px solid #303951;
-    border-radius: 11px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    padding-left: 14px;
-    color: #d9deea;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-
-/* Premium card */
-
-.premium-card {
-    margin-top: 33px;
+.premium {
+    margin-top: 35px;
     padding: 17px;
     border-radius: 15px;
-    border: 1px solid #512a88;
-    background:
-        linear-gradient(
-            145deg,
-            #291449 0%,
-            #17122d 100%
-        );
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.20);
+    background: linear-gradient(145deg, #2a1449, #141126);
+    border: 1px solid #54288c;
 }
 
 .premium-title {
-    color: #b35cff;
+    color: #b65aff;
     font-size: 14px;
     font-weight: 800;
 }
 
-.premium-description {
-    color: #9da5b8;
+.premium-text {
+    color: #929bb0;
     font-size: 11px;
-    line-height: 1.55;
+    line-height: 1.5;
     margin-top: 7px;
     margin-bottom: 13px;
 }
 
 
-/* Premium button */
+/* Sidebar upgrade button */
 
-[data-testid="stSidebar"] .premium-button .stButton > button {
-    background: linear-gradient(
-        135deg,
-        #8537ff,
-        #6120d9
-    );
-    border: none;
-    color: white;
-    text-align: center;
-    height: 41px;
+[data-testid="stSidebar"] button[kind="secondary"] {
+    color: #ffffff;
 }
 
 
 /* Profile */
 
-.profile-section {
-    border-top: 1px solid #202942;
-    margin-top: 28px;
+.profile {
+    border-top: 1px solid #202943;
+    margin-top: 27px;
     padding-top: 18px;
     display: flex;
     align-items: center;
 }
 
-.profile-avatar {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
+.avatar {
+    width: 41px;
+    height: 41px;
     border-radius: 50%;
-    background: #32175f;
-    color: #c993ff;
+    background: #351761;
+    color: #bd7cff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 17px;
     font-weight: 800;
     margin-right: 11px;
 }
 
 .profile-name {
-    color: #f2f4f8;
+    color: #f0f2f7;
     font-size: 13px;
     font-weight: 700;
 }
 
 .profile-plan {
-    color: #778197;
+    color: #788298;
     font-size: 10px;
     margin-top: 3px;
 }
 
 
-/* =========================================================
+/* ========================================================
    HEADER
-   ========================================================= */
+   ======================================================== */
 
-.top-header {
+.header-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -344,345 +303,220 @@ footer {
 }
 
 .greeting {
-    color: #f5f6fa;
+    color: #f5f5f8;
     font-size: 34px;
     font-weight: 800;
-    letter-spacing: -1.2px;
-    line-height: 1.1;
+    letter-spacing: -1px;
 }
 
-.greeting-name {
-    color: #874cff;
+.greeting-purple {
+    color: #8746ff;
 }
 
-.greeting-sub {
-    color: #7e889e;
+.subtitle {
+    color: #7f899f;
     font-size: 12px;
-    margin-top: 8px;
+    margin-top: 7px;
 }
 
 
-/* Date card */
+/* Date */
 
-.date-card {
-    width: 155px;
-    min-height: 76px;
-    background: #10172a;
-    border: 1px solid #29334c;
+.date-box {
+    width: 160px;
+    min-height: 77px;
     border-radius: 16px;
-    padding: 13px 15px;
-    box-sizing: border-box;
+    background: #101629;
+    border: 1px solid #29334b;
+    padding: 12px 15px;
 }
 
 .date-icon {
-    color: #d9deea;
     font-size: 17px;
 }
 
-.date-text {
-    color: #e5e8ef;
+.date-value {
+    color: #e7eaf1;
     font-size: 11px;
     font-weight: 700;
     margin-top: 3px;
 }
 
-.time-text {
-    color: #78839a;
+.time-value {
+    color: #788298;
     font-size: 10px;
     margin-top: 3px;
 }
 
 
-/* =========================================================
-   STATISTICS
-   ========================================================= */
+/* ========================================================
+   STAT CARDS
+   ======================================================== */
 
 .stat-card {
-    min-height: 182px;
+    height: 183px;
     padding: 20px;
     border-radius: 18px;
-    position: relative;
-    overflow: hidden;
     box-sizing: border-box;
 }
 
 .stat-purple {
-    background:
-        linear-gradient(
-            145deg,
-            #17112a,
-            #0d1325
-        );
-    border: 1px solid #542b83;
+    background: linear-gradient(145deg, #171029, #0c1223);
+    border: 1px solid #542b85;
 }
 
 .stat-blue {
-    background:
-        linear-gradient(
-            145deg,
-            #0c1a31,
-            #0d1427
-        );
-    border: 1px solid #19447b;
+    background: linear-gradient(145deg, #0d1b32, #0c1325);
+    border: 1px solid #1d4d83;
 }
 
 .stat-green {
-    background:
-        linear-gradient(
-            145deg,
-            #092323,
-            #0d1627
-        );
-    border: 1px solid #14584e;
+    background: linear-gradient(145deg, #092421, #0c1525);
+    border: 1px solid #155c4d;
 }
 
 .stat-orange {
-    background:
-        linear-gradient(
-            145deg,
-            #21190f,
-            #0d1526
-        );
-    border: 1px solid #63471e;
+    background: linear-gradient(145deg, #21180d, #0d1424);
+    border: 1px solid #67491e;
 }
 
 
-/* Stat icons */
-
 .stat-icon {
-    width: 44px;
-    height: 44px;
+    width: 43px;
+    height: 43px;
     border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 21px;
+    font-size: 20px;
     margin-bottom: 17px;
 }
 
-.purple-icon {
-    background: #321454;
-    color: #c15cff;
-    border: 1px solid #6932a2;
+.icon-purple {
+    background: #341454;
+    border: 1px solid #7136a5;
 }
 
-.blue-icon {
-    background: #102e54;
-    color: #56a4ff;
-    border: 1px solid #1c589a;
+.icon-blue {
+    background: #102f56;
+    border: 1px solid #205b9a;
 }
 
-.green-icon {
-    background: #0b3c34;
-    color: #38df9d;
-    border: 1px solid #16715e;
+.icon-green {
+    background: #0a3b32;
+    border: 1px solid #17725d;
 }
 
-.orange-icon {
-    background: #4a3113;
-    color: #ffad22;
-    border: 1px solid #78511e;
+.icon-orange {
+    background: #493013;
+    border: 1px solid #7a531d;
 }
 
 
 .stat-number {
-    color: #f1f4fa;
+    color: #f0f3f8;
     font-size: 28px;
     font-weight: 800;
-    line-height: 1;
 }
 
 .stat-title {
-    color: #d8dce6;
+    color: #d8dce5;
     font-size: 14px;
     font-weight: 700;
-    margin-top: 8px;
-}
-
-.stat-subtitle {
-    color: #7f899e;
-    font-size: 10px;
     margin-top: 5px;
 }
 
-
-/* =========================================================
-   CHAT PANEL
-   ========================================================= */
-
-.chat-panel {
-    margin-top: 30px;
-    border: 1px solid #242e48;
-    border-radius: 19px;
-    background: #080e20;
-    overflow: hidden;
-    min-height: 580px;
+.stat-description {
+    color: #7d879c;
+    font-size: 10px;
+    margin-top: 4px;
 }
 
 
-/* Chat top */
+/* ========================================================
+   CHAT AREA
+   ======================================================== */
 
-.chat-panel-header {
-    height: 91px;
-    border-bottom: 1px solid #222b43;
+.chat-container {
+    margin-top: 30px;
+    border-radius: 19px;
+    background: #080e20;
+    border: 1px solid #242e48;
+    overflow: hidden;
+}
+
+.chat-header {
+    min-height: 90px;
     padding: 20px 25px;
-    box-sizing: border-box;
+    border-bottom: 1px solid #222b42;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
 }
 
-.chat-heading-wrap {
+.chat-title-area {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 13px;
 }
 
-.chat-header-icon {
+.chat-icon {
     width: 40px;
     height: 40px;
     border-radius: 12px;
     background: #351460;
-    border: 1px solid #7133ae;
+    border: 1px solid #7034aa;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 19px;
 }
 
-.chat-heading {
-    color: #f3f4f8;
+.chat-title {
+    color: #f2f3f7;
     font-size: 20px;
     font-weight: 800;
 }
 
-.chat-subheading {
-    color: #7f899e;
+.chat-subtitle {
+    color: #7d879d;
     font-size: 11px;
     margin-top: 3px;
 }
 
-
-/* New chat */
-
 .new-chat {
-    background: linear-gradient(
-        135deg,
-        #8037ff,
-        #6120d9
-    );
-    border: 1px solid #914eff;
-    border-radius: 11px;
-    color: white;
     padding: 12px 19px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #8438ff, #5e20d3);
+    border: 1px solid #914dff;
+    color: white;
     font-size: 12px;
     font-weight: 700;
-}
-
-
-/* Chat body */
-
-.chat-body {
-    min-height: 385px;
-    padding: 26px 25px;
-}
-
-
-/* User message */
-
-.user-row {
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    gap: 12px;
-    margin: 15px 0 27px 0;
-}
-
-.user-message {
-    max-width: 430px;
-    background: linear-gradient(
-        135deg,
-        #7130e9,
-        #5621c2
-    );
-    border-radius: 14px 14px 5px 14px;
-    padding: 13px 17px;
-    color: white;
-    font-size: 13px;
-    line-height: 1.55;
-}
-
-.user-time {
-    color: #c4b4f4;
-    font-size: 9px;
-    text-align: right;
-    margin-top: 7px;
-}
-
-.user-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: #3a176e;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #b76aff;
-    font-size: 18px;
-}
-
-
-/* AI message */
-
-.ai-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    margin: 0 0 25px 0;
-}
-
-.ai-avatar {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    border-radius: 50%;
-    background: #102e54;
-    border: 1px solid #245da0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #5ca9ff;
-    font-size: 18px;
-}
-
-.ai-message {
-    max-width: 500px;
-    background: #171e31;
-    border: 1px solid #29344c;
-    border-radius: 5px 14px 14px 14px;
-    padding: 13px 17px;
-    color: #e2e6ee;
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.ai-time {
-    color: #7b879e;
-    font-size: 9px;
-    margin-top: 7px;
 }
 
 
 /* Empty state */
 
-.empty-chat {
+.empty-state {
+    min-height: 390px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 75px 10px;
 }
 
-.empty-icon {
-    font-size: 46px;
-    margin-bottom: 14px;
+.empty-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: #151d31;
+    border: 1px solid #303b55;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 16px;
 }
 
 .empty-title {
@@ -691,60 +525,60 @@ footer {
     font-weight: 800;
 }
 
-.empty-subtitle {
-    color: #78839a;
+.empty-text {
+    color: #778298;
     font-size: 11px;
-    margin-top: 7px;
+    margin-top: 6px;
 }
 
 
-/* =========================================================
-   STREAMLIT CHAT INPUT
-   ========================================================= */
+/* ========================================================
+   CHAT INPUT
+   ======================================================== */
 
 [data-testid="stChatInput"] {
-    margin: 0 25px 25px 25px;
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-bottom: 25px;
 }
 
 [data-testid="stChatInput"] > div {
     background: #1a2336 !important;
-    border: 1px solid #39455e !important;
+    border: 1px solid #3a465f !important;
     border-radius: 17px !important;
     box-shadow: none !important;
 }
 
 [data-testid="stChatInput"] textarea {
-    color: #ffffff !important;
-    background: transparent !important;
+    color: white !important;
     font-size: 13px !important;
 }
 
 [data-testid="stChatInput"] textarea::placeholder {
-    color: #7c879c !important;
+    color: #7d879c !important;
 }
 
 
-/* =========================================================
+/* ========================================================
    FOOTER
-   ========================================================= */
+   ======================================================== */
 
 .app-footer {
     text-align: center;
-    color: #727d94;
+    color: #707b91;
     font-size: 10px;
-    margin-top: 25px;
-    padding-bottom: 5px;
+    margin-top: 22px;
 }
 
-.footer-heart {
+.heart {
     color: #a855f7;
     font-size: 14px;
 }
 
 
-/* =========================================================
+/* ========================================================
    MOBILE
-   ========================================================= */
+   ======================================================== */
 
 @media (max-width: 900px) {
 
@@ -754,100 +588,102 @@ footer {
     }
 
     .greeting {
-        font-size: 27px;
+        font-size: 26px;
     }
 
-    .date-card {
-        width: 135px;
+    .date-box {
+        width: 130px;
     }
 
-    .stat-card {
-        margin-bottom: 12px;
-    }
 }
 
 </style>
-"""
+""",
+    unsafe_allow_html=True
+)
 
-st.markdown(css, unsafe_allow_html=True)
 
-
-# ============================================================
+# =========================================================
 # SIDEBAR
-# ============================================================
+# =========================================================
 
 with st.sidebar:
 
     st.markdown(
         """
-        <div class="brand-container">
-            <div class="brand-logo">🤖</div>
+        <div class="brand">
+
+            <div class="brand-logo">
+                🤖
+            </div>
 
             <div>
-                <div class="brand-name">Danish AI</div>
+                <div class="brand-title">
+                    Danish AI
+                </div>
+
                 <div class="brand-subtitle">
                     Your intelligent AI Assistant
                 </div>
             </div>
+
         </div>
         """,
         unsafe_allow_html=True
     )
 
     st.markdown(
-        '<div class="sidebar-label">WORKSPACE</div>',
+        '<div class="sidebar-heading">WORKSPACE</div>',
         unsafe_allow_html=True
     )
 
-    if st.button("⌂   Dashboard", key="dashboard_button"):
+    if st.button("⌂   Dashboard", use_container_width=True):
         st.session_state.page = "Dashboard"
         st.rerun()
 
-    if st.button("▣   AI Chat", key="chat_button"):
+    if st.button("▣   AI Chat", use_container_width=True):
         st.session_state.page = "Chat"
         st.rerun()
 
-    if st.button("▥   Usage & Stats", key="stats_button"):
+    if st.button("▥   Usage & Stats", use_container_width=True):
         st.session_state.page = "Stats"
         st.rerun()
 
-    if st.button("⚙   Settings", key="settings_button"):
+    if st.button("⚙   Settings", use_container_width=True):
         st.session_state.page = "Settings"
         st.rerun()
 
     st.markdown(
-        '<div class="sidebar-line"></div>',
+        '<div class="divider"></div>',
         unsafe_allow_html=True
     )
 
     st.markdown(
-        '<div class="sidebar-label">CHAT</div>',
+        '<div class="sidebar-heading">CHAT</div>',
         unsafe_allow_html=True
     )
 
     if st.button(
-        "▣   Clear Conversation",
-        key="clear_conversation"
+        "🗑   Clear Conversation",
+        use_container_width=True
     ):
-
         st.session_state.messages = [
             {
                 "role": "system",
                 "content": SYSTEM_PROMPT
             }
         ]
-
         st.rerun()
 
     st.markdown(
         """
-        <div class="premium-card">
+        <div class="premium">
 
             <div class="premium-title">
                 ♛ Danish AI Premium
             </div>
 
-            <div class="premium-description">
+            <div class="premium-text">
                 Unlock more power and exclusive features.
             </div>
 
@@ -858,15 +694,15 @@ with st.sidebar:
 
     if st.button(
         "Upgrade Now",
-        key="upgrade"
+        use_container_width=True
     ):
-        st.info("Premium plans coming soon.")
+        st.info("Premium features coming soon.")
 
     st.markdown(
         """
-        <div class="profile-section">
+        <div class="profile">
 
-            <div class="profile-avatar">
+            <div class="avatar">
                 D
             </div>
 
@@ -886,59 +722,53 @@ with st.sidebar:
     )
 
 
-# ============================================================
+# =========================================================
 # DASHBOARD
-# ============================================================
+# =========================================================
 
 if st.session_state.page == "Dashboard":
 
-    now = datetime.now()
+    # Header
 
-    date_text = now.strftime("%B %d, %Y")
-    time_text = now.strftime("%I:%M %p")
+    col_left, col_right = st.columns([5, 1])
 
-
-    # HEADER
-
-    left_col, right_col = st.columns(
-        [5.5, 1.25]
-    )
-
-    with left_col:
+    with col_left:
 
         st.markdown(
             """
             <div class="greeting">
                 Good evening,
-                <span class="greeting-name">
+                <span class="greeting-purple">
                     Danish
                 </span>
                 👋
             </div>
 
-            <div class="greeting-sub">
+            <div class="subtitle">
                 Here's what's happening with Danish AI today.
             </div>
             """,
             unsafe_allow_html=True
         )
 
-    with right_col:
+    with col_right:
+
+        now = datetime.now()
 
         st.markdown(
             f"""
-            <div class="date-card">
+            <div class="date-box">
 
                 <div class="date-icon">
-                    ▣
+                    📅
                 </div>
 
-                <div class="date-text">
-                    {date_text}
+                <div class="date-value">
+                    {now.strftime("%B %d, %Y")}
                 </div>
 
-                <div class="time-text">
-                    {time_text}
+                <div class="time-value">
+                    {now.strftime("%I:%M %p")}
                 </div>
 
             </div>
@@ -947,21 +777,20 @@ if st.session_state.page == "Dashboard":
         )
 
 
-    # ========================================================
-    # STAT CARDS
-    # ========================================================
+    # =====================================================
+    # STATISTICS
+    # =====================================================
 
-    c1, c2, c3, c4 = st.columns(4)
+    s1, s2, s3, s4 = st.columns(4)
 
-
-    with c1:
+    with s1:
 
         st.markdown(
             f"""
             <div class="stat-card stat-purple">
 
-                <div class="stat-icon purple-icon">
-                    ▣
+                <div class="stat-icon icon-purple">
+                    💬
                 </div>
 
                 <div class="stat-number">
@@ -972,7 +801,7 @@ if st.session_state.page == "Dashboard":
                     Messages
                 </div>
 
-                <div class="stat-subtitle">
+                <div class="stat-description">
                     Total messages
                 </div>
 
@@ -981,14 +810,13 @@ if st.session_state.page == "Dashboard":
             unsafe_allow_html=True
         )
 
-
-    with c2:
+    with s2:
 
         st.markdown(
             f"""
             <div class="stat-card stat-blue">
 
-                <div class="stat-icon blue-icon">
+                <div class="stat-icon icon-blue">
                     ♙
                 </div>
 
@@ -1000,7 +828,7 @@ if st.session_state.page == "Dashboard":
                     Questions
                 </div>
 
-                <div class="stat-subtitle">
+                <div class="stat-description">
                     Asked by you
                 </div>
 
@@ -1009,26 +837,25 @@ if st.session_state.page == "Dashboard":
             unsafe_allow_html=True
         )
 
-
-    with c3:
+    with s3:
 
         st.markdown(
             f"""
             <div class="stat-card stat-green">
 
-                <div class="stat-icon green-icon">
+                <div class="stat-icon icon-green">
                     🤖
                 </div>
 
                 <div class="stat-number">
-                    {assistant_messages}
+                    {ai_messages}
                 </div>
 
                 <div class="stat-title">
                     AI Responses
                 </div>
 
-                <div class="stat-subtitle">
+                <div class="stat-description">
                     From Danish AI
                 </div>
 
@@ -1037,14 +864,13 @@ if st.session_state.page == "Dashboard":
             unsafe_allow_html=True
         )
 
-
-    with c4:
+    with s4:
 
         st.markdown(
             """
             <div class="stat-card stat-orange">
 
-                <div class="stat-icon orange-icon">
+                <div class="stat-icon icon-orange">
                     🔥
                 </div>
 
@@ -1056,7 +882,7 @@ if st.session_state.page == "Dashboard":
                     Roast Mode
                 </div>
 
-                <div class="stat-subtitle">
+                <div class="stat-description">
                     Funny roasts
                 </div>
 
@@ -1066,29 +892,29 @@ if st.session_state.page == "Dashboard":
         )
 
 
-    # ========================================================
+    # =====================================================
     # CHAT HEADER
-    # ========================================================
+    # =====================================================
 
     st.markdown(
         """
-        <div class="chat-panel">
+        <div class="chat-container">
 
-            <div class="chat-panel-header">
+            <div class="chat-header">
 
-                <div class="chat-heading-wrap">
+                <div class="chat-title-area">
 
-                    <div class="chat-header-icon">
-                        ▣
+                    <div class="chat-icon">
+                        💬
                     </div>
 
                     <div>
 
-                        <div class="chat-heading">
+                        <div class="chat-title">
                             AI Chat
                         </div>
 
-                        <div class="chat-subheading">
+                        <div class="chat-subtitle">
                             Talk with Danish AI.
                         </div>
 
@@ -1102,37 +928,37 @@ if st.session_state.page == "Dashboard":
 
             </div>
 
-            <div class="chat-body">
+        </div>
         """,
         unsafe_allow_html=True
     )
 
 
-    # ========================================================
+    # =====================================================
     # CHAT MESSAGES
-    # ========================================================
+    # =====================================================
 
     visible_messages = [
-        m for m in st.session_state.messages
-        if m["role"] != "system"
+        message
+        for message in st.session_state.messages
+        if message["role"] != "system"
     ]
-
 
     if not visible_messages:
 
         st.markdown(
             """
-            <div class="empty-chat">
+            <div class="empty-state">
 
-                <div class="empty-icon">
+                <div class="empty-logo">
                     🤖
                 </div>
 
                 <div class="empty-title">
-                    How can I help you today?
+                    How can I help you?
                 </div>
 
-                <div class="empty-subtitle">
+                <div class="empty-text">
                     Ask Danish AI anything.
                 </div>
 
@@ -1145,131 +971,93 @@ if st.session_state.page == "Dashboard":
 
         for message in visible_messages:
 
-            if message["role"] == "user":
-
-                safe_text = message["content"].replace(
-                    "<",
-                    "&lt;"
-                ).replace(
-                    ">",
-                    "&gt;"
-                )
-
-                st.markdown(
-                    f"""
-                    <div class="user-row">
-
-                        <div class="user-message">
-
-                            {safe_text}
-
-                            <div class="user-time">
-                                {datetime.now().strftime("%I:%M %p")} ✓
-                            </div>
-
-                        </div>
-
-                        <div class="user-avatar">
-                            ●
-                        </div>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-            else:
-
-                safe_text = message["content"].replace(
-                    "<",
-                    "&lt;"
-                ).replace(
-                    ">",
-                    "&gt;"
-                )
-
-                st.markdown(
-                    f"""
-                    <div class="ai-row">
-
-                        <div class="ai-avatar">
-                            🤖
-                        </div>
-
-                        <div class="ai-message">
-
-                            {safe_text}
-
-                            <div class="ai-time">
-                                {datetime.now().strftime("%I:%M %p")}
-                            </div>
-
-                        </div>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+            with st.chat_message(
+                message["role"],
+                avatar="🤖" if message["role"] == "assistant" else "D"
+            ):
+                st.markdown(message["content"])
 
 
-    st.markdown(
-        """
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # =====================================================
+    # ROAST MODE
+    # =====================================================
+
+    roast_col, spacer = st.columns([1, 6])
+
+    with roast_col:
+
+        if st.button(
+            "🔥 Roast Mode",
+            use_container_width=True
+        ):
+            st.session_state.roast_mode = (
+                not st.session_state.roast_mode
+            )
 
 
-    # ========================================================
+    # =====================================================
     # CHAT INPUT
-    # ========================================================
+    # =====================================================
 
-    user_input = st.chat_input(
-        "Type your message..."
+    placeholder = (
+        "Roast me..."
+        if st.session_state.roast_mode
+        else "Type your message..."
     )
+
+    user_input = st.chat_input(placeholder)
 
 
     if user_input:
 
+        final_input = user_input
+
+        if st.session_state.roast_mode:
+
+            final_input = (
+                "Roast me playfully and harmlessly. "
+                "Here is what I said: "
+                + user_input
+            )
+
         st.session_state.messages.append(
             {
                 "role": "user",
-                "content": user_input
+                "content": final_input
             }
         )
 
-        with st.spinner("Danish AI is thinking..."):
+        try:
 
-            try:
+            with st.spinner("Danish AI is thinking..."):
 
                 response = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=st.session_state.messages
                 )
 
-                answer = response.choices[0].message.content
+            answer = response.choices[0].message.content
 
-                st.session_state.messages.append(
-                    {
-                        "role": "assistant",
-                        "content": answer
-                    }
-                )
+            st.session_state.messages.append(
+                {
+                    "role": "assistant",
+                    "content": answer
+                }
+            )
 
-                st.rerun()
+            st.rerun()
 
-            except Exception as e:
+        except Exception as error:
 
-                st.error(
-                    "Danish AI could not respond. "
-                    "Please check your OpenAI API key."
-                )
+            st.error(
+                "Danish AI couldn't connect to OpenAI. "
+                "Please check your API key."
+            )
 
 
-# ============================================================
-# CHAT PAGE
-# ============================================================
+# =========================================================
+# AI CHAT PAGE
+# =========================================================
 
 elif st.session_state.page == "Chat":
 
@@ -1277,37 +1065,32 @@ elif st.session_state.page == "Chat":
         """
         <div class="greeting">
             AI Chat
-            <span class="greeting-name">💬</span>
+            <span class="greeting-purple">
+                💬
+            </span>
         </div>
 
-        <div class="greeting-sub">
+        <div class="subtitle">
             Talk with Danish AI.
         </div>
         """,
         unsafe_allow_html=True
     )
 
-
     for message in st.session_state.messages:
 
         if message["role"] == "system":
             continue
 
-        if message["role"] == "user":
-
-            with st.chat_message("user"):
-                st.markdown(message["content"])
-
-        else:
-
-            with st.chat_message("assistant"):
-                st.markdown(message["content"])
-
+        with st.chat_message(
+            message["role"],
+            avatar="🤖" if message["role"] == "assistant" else "D"
+        ):
+            st.markdown(message["content"])
 
     user_input = st.chat_input(
         "Type your message..."
     )
-
 
     if user_input:
 
@@ -1343,9 +1126,9 @@ elif st.session_state.page == "Chat":
             )
 
 
-# ============================================================
-# STATS PAGE
-# ============================================================
+# =========================================================
+# USAGE & STATS
+# =========================================================
 
 elif st.session_state.page == "Stats":
 
@@ -1353,10 +1136,12 @@ elif st.session_state.page == "Stats":
         """
         <div class="greeting">
             Usage & Stats
-            <span class="greeting-name">📊</span>
+            <span class="greeting-purple">
+                📊
+            </span>
         </div>
 
-        <div class="greeting-sub">
+        <div class="subtitle">
             Your Danish AI activity.
         </div>
         """,
@@ -1380,13 +1165,13 @@ elif st.session_state.page == "Stats":
     with c:
         st.metric(
             "AI Responses",
-            assistant_messages
+            ai_messages
         )
 
 
-# ============================================================
-# SETTINGS PAGE
-# ============================================================
+# =========================================================
+# SETTINGS
+# =========================================================
 
 elif st.session_state.page == "Settings":
 
@@ -1394,16 +1179,17 @@ elif st.session_state.page == "Settings":
         """
         <div class="greeting">
             Settings
-            <span class="greeting-name">⚙️</span>
+            <span class="greeting-purple">
+                ⚙️
+            </span>
         </div>
 
-        <div class="greeting-sub">
+        <div class="subtitle">
             Customize your Danish AI experience.
         </div>
         """,
         unsafe_allow_html=True
     )
-
 
     st.selectbox(
         "Language",
@@ -1422,24 +1208,19 @@ elif st.session_state.page == "Settings":
     )
 
     st.toggle(
-        "🔥 Roast Mode"
+        "Enable Roast Mode"
     )
 
 
-    st.info(
-        "Danish AI — Your Intelligent AI Assistant"
-    )
-
-
-# ============================================================
+# =========================================================
 # FOOTER
-# ============================================================
+# =========================================================
 
 st.markdown(
     """
     <div class="app-footer">
         Danish AI • Your Intelligent AI Assistant
-        <span class="footer-heart">♡</span>
+        <span class="heart">♡</span>
     </div>
     """,
     unsafe_allow_html=True
