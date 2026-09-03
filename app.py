@@ -174,7 +174,7 @@ if user_input:
 
 
 with st.sidebar:
-    st.header("⚙️ Danish AI")
+    st.markdown("## 🤖 Danish AI")
 
     st.write("### Features")
     st.write("💬 AI Chat")
