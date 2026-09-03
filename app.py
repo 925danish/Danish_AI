@@ -93,6 +93,7 @@ css = f"""
 <style>
 .stApp{{background:{T['bg']};color:{T['text']};}}
 [data-testid="stSidebar"]{{background:{T['sidebar_bg']};border-right:1px solid {T['border']};}}
+[data-testid="stSidebar"] > div{{padding:1.2rem 1rem;}}
 [data-testid="stSidebar"] *{{color:{T['text']};}}
 #MainMenu, footer, header{{visibility:hidden;}}
 
@@ -188,6 +189,32 @@ button[kind="primary"]{{
 }}
 button[kind="primary"]:hover{{background:{T['accent_hover']}!important;}}
 div[data-testid="stChatInput"]{{border-top:1px solid {T['border']};padding-top:12px;}}
+
+textarea, input[type="text"], input[type="number"], input[type="password"]{{
+    background:{T['input_bg']}!important;color:{T['text']}!important;
+    border:1px solid {T['border']}!important;border-radius:8px!important;
+    caret-color:{T['text']}!important;
+}}
+textarea::placeholder, input::placeholder{{color:{T['text_muted']}!important;opacity:1!important;}}
+div[data-testid="stChatInput"] > div{{background:{T['input_bg']}!important;border:1px solid {T['border']}!important;}}
+[data-baseweb="textarea"]{{background:{T['input_bg']}!important;}}
+[data-baseweb="base-input"]{{background:{T['input_bg']}!important;}}
+
+div[data-testid="stBottomBlockContainer"],
+div[data-testid="stChatFloatingInputContainer"],
+div[class*="stBottom"],
+div[data-testid*="Bottom"],
+.stApp > div:last-child{{background:{T['bg']}!important;}}
+div[data-testid="stChatInput"] *{{color:{T['text']}!important;}}
+button[data-testid="stChatInputSubmitButton"]{{background:{T['accent']}!important;border:none!important;}}
+button[data-testid="stChatInputSubmitButton"] svg{{fill:#fff!important;}}
+
+[data-testid="stSidebar"] .stButton{{margin-bottom:8px;}}
+[data-testid="stSidebar"] .stVerticalBlock{{gap:0.4rem;}}
+.stat-card{{margin-bottom:4px;}}
+[data-testid="column"]{{padding:0 6px;}}
+.chat-panel{{margin-top:28px;}}
+.greeting-row{{margin-bottom:28px;}}
 </style>
 """
 st.markdown(css, unsafe_allow_html=True)
@@ -324,7 +351,6 @@ def render_stat_cards():
                 f"<div class='stat-number'>{number}</div>"
                 f"<div class='stat-label'>{label}</div>"
                 f"<div class='stat-sub'>{sub}</div>"
-                f"{sparkline(spark_color, spark)}"
                 "</div>",
                 unsafe_allow_html=True
             )
