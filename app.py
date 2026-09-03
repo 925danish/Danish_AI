@@ -6,8 +6,7 @@ st.set_page_config(
     page_icon="🤖",
     layout="wide"
 )
-st.title("Danish_AI")
-st.caption("Your intelligent AI Assistant")
+
 st.markdown("""
 <style>
 
