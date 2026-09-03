@@ -1,15 +1,13 @@
 import streamlit as st
 from openai import OpenAI
-
-
 st.set_page_config(
    
     page_title="Danish AI |Your AI Assistant",
     page_icon="🤖",
-    layout="Wide"
+    layout="wide"
 )
 st.title("Danish_AI")
-st.caption("Your intellegent AI Assistant")
+st.caption("Your intelligent AI Assistant")
 st.markdown("""
 <style>
     .main-title {
