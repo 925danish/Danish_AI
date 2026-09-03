@@ -34,11 +34,13 @@ st.markdown("""
 
 /* Chat messages */
 .stChatMessage {
-    border-radius: 18px;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.04);
+    border-radius: 20px;
+    padding: 14px 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.55);
+    box-shadow: 0 4x 15px 
+    rgba(0,0,0,0.15);
 }
 
 /* Chat input */
