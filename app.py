@@ -28,6 +28,8 @@ st.markdown("""
 
     .stChatMessage {
         border-radius: 15px;
+        padding: 10px;
+        margin-bottom: 8px;
     }
 </style>
 """, unsafe_allow_html=True)
