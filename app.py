@@ -6,42 +6,85 @@ st.set_page_config(
     page_icon="🤖",
     layout="wide"
 )
-
 st.markdown("""
 <style>
+/* Main background */
+.stApp {
+    background: linear-gradient(135deg, #0f172a 0%, #111827 50%, #1e1b4b 100%);
+    color: white;
+}
 
+/* Main title */
 .main-title {
     text-align: center;
     font-size: 46px;
     font-weight: 800;
     margin-top: 10px;
     margin-bottom: 5px;
+    color: #ffffff;
 }
 
+/* Subtitle */
 .subtitle {
     text-align: center;
     font-size: 17px;
-    opacity: 0.75;
-    margin-bottom: 30px;
+    color: #a5b4fc;
+    margin-bottom: 35px;
 }
 
+/* Chat messages */
 .stChatMessage {
     border-radius: 18px;
     padding: 12px;
     margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
 }
 
+/* Chat input */
 .stChatInputContainer {
-    border-radius: 20px;
+    border-radius: 18px;
 }
 
-section[data-testid="stSidebar"] {
-    padding-top: 20px;
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background: #0b1120;
+    border-right: 1px solid rgba(255,255,255,0.08);
 }
 
+/* Sidebar heading */
+[data-testid="stSidebar"] h2 {
+    color: #a5b4fc;
+}
+
+/* Buttons */
+.stButton > button {
+    border-radius: 12px;
+    border: 1px solid rgba(165,180,252,0.3);
+    background: rgba(99,102,241,0.15);
+    color: white;
+    font-weight: 600;
+}
+
+.stButton > button:hover {
+    border-color: #818cf8;
+    background: rgba(99,102,241,0.3);
+}
+
+/* Hide Streamlit branding */
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
 </style>
 """, unsafe_allow_html=True)
-    
+
+
+
+
        
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
