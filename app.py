@@ -1,15 +1,15 @@
 import streamlit as st
 from openai import OpenAI
 
-# -----------------------------
-# Page settings
-# -----------------------------
+
 st.set_page_config(
    
-    page_title="Danish AI",
+    page_title="Danish AI |Your AI Assistant",
     page_icon="🤖",
-    layout="centered"
+    layout="Wide"
 )
+st.title(Danish_AI")
+st.caption("Your inyellegent AI Assistant")
 st.markdown("""
 <style>
     .main-title {
@@ -32,14 +32,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# OpenAI connection
-# -----------------------------
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# -----------------------------
-# Danish AI personality
-# -----------------------------
+
 SYSTEM_PROMPT = """
 You are Danish AI, a friendly and intelligent AI assistant.
 
@@ -57,18 +52,14 @@ Roast mode:
 You can switch naturally between helpful mode and playful roast mode.
 """
 
-# -----------------------------
-# Title
-# -----------------------------
+
 st.markdown('<div class="main-title">🤖 Danish AI</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="subtitle">Your AI assistant  🔥</div>',
     unsafe_allow_html=True
 )
 
-# -----------------------------
-# Chat history
-# -----------------------------
+
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
@@ -77,7 +68,7 @@ if "messages" not in st.session_state:
         }
     ]
 
-# Display previous messages
+
 for message in st.session_state.messages:
     if message["role"] == "system":
         continue
@@ -85,9 +76,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# -----------------------------
-# User input
-# -----------------------------
+
 user_input = st.chat_input("Ask Danish AI anything...")
 
 if user_input:
@@ -103,7 +92,7 @@ if user_input:
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # Get AI response
+   
     with st.chat_message("assistant"):
         with st.spinner("Danish AI is thinking... 🤔"):
 
@@ -116,7 +105,6 @@ if user_input:
 
             st.markdown(answer)
 
-    # Save AI response
     st.session_state.messages.append(
         {
             "role": "assistant",
@@ -124,17 +112,14 @@ if user_input:
         }
     )
 
-# -----------------------------
-# Sidebar
-# -----------------------------
+
 with st.sidebar:
     st.header("⚙️ Danish AI")
 
     st.write("### Features")
     st.write("💬 AI Chat")
     st.write("🇵🇰 Urdu + English")
-    st.write("🔥 Roast Mode")
-    st.write("🧠 Conversation Memory")
+     st.write("🧠 Conversation Memory")
 
     if st.button("🗑️ Clear Chat"):
         st.session_state.messages = [
