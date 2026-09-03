@@ -172,4 +172,9 @@ css = "\n".join([
     "}",
 
     ".pro-card {",
-    "    ba
+"    background: linear-gradient(135deg, #7c3aed, #4f46e5);",
+"    border-radius: 18px;",
+"    padding: 22px;",
+"    margin-top: 18px;",
+"}",
+
