@@ -1,10 +1,11 @@
 import streamlit as st
 from openai import OpenAI
+from datetime import datetime
 
 
-# ==================================================
+# =========================================================
 # PAGE CONFIG
-# ==================================================
+# =========================================================
 
 st.set_page_config(
     page_title="Danish AI",
@@ -14,38 +15,40 @@ st.set_page_config(
 )
 
 
-# ==================================================
+# =========================================================
 # OPENAI
-# ==================================================
+# =========================================================
 
 client = OpenAI(
     api_key=st.secrets["OPENAI_API_KEY"]
 )
 
 
-# ==================================================
+# =========================================================
 # SYSTEM PROMPT
-# ==================================================
+# =========================================================
 
 SYSTEM_PROMPT = """
 You are Danish AI, a friendly and intelligent AI assistant.
 
-Answer questions clearly and helpfully.
+Your job is to:
+- Answer questions clearly and helpfully.
+- Help with coding, learning, writing, business and general questions.
+- Speak English or Urdu depending on the user's language.
+- Be friendly and conversational.
 
-You can communicate in English or Urdu depending on the user's language.
+Roast Mode:
+- If the user asks for a roast or says "roast me", give a funny,
+  playful and harmless roast.
+- Never use hateful, threatening or seriously abusive language.
 
-If the user asks to roast them:
-- Give a funny playful roast.
-- Keep it harmless.
-- Never use hateful, threatening, or seriously abusive language.
-
-Be conversational and helpful.
+Keep responses useful and natural.
 """
 
 
-# ==================================================
+# =========================================================
 # SESSION STATE
-# ==================================================
+# =========================================================
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
@@ -55,40 +58,43 @@ if "messages" not in st.session_state:
         }
     ]
 
-
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
 
+if "roast_mode" not in st.session_state:
+    st.session_state.roast_mode = False
 
-# ==================================================
+
+# =========================================================
 # CUSTOM CSS
-# ==================================================
+# =========================================================
 
 st.markdown("""
 <style>
 
-html, body, [class*="css"] {
-    font-family: Inter, Arial, sans-serif;
-}
+/* =====================================================
+   GLOBAL
+   ===================================================== */
 
 .stApp {
     background:
         radial-gradient(
-            circle at 15% 10%,
-            rgba(99,102,241,0.16),
+            circle at 25% 10%,
+            rgba(79, 70, 229, 0.10),
             transparent 30%
         ),
         radial-gradient(
-            circle at 85% 80%,
-            rgba(168,85,247,0.12),
+            circle at 80% 70%,
+            rgba(124, 58, 237, 0.08),
             transparent 30%
         ),
-        #080b16;
-    color: #ffffff;
+        #070b18;
+
+    color: #f8fafc;
 }
 
 
-/* Remove Streamlit branding */
+/* Hide Streamlit default branding */
 
 #MainMenu {
     visibility: hidden;
@@ -99,280 +105,515 @@ footer {
 }
 
 
-/* Sidebar */
+/* =====================================================
+   SIDEBAR
+   ===================================================== */
 
 [data-testid="stSidebar"] {
-    background: #0b0f1c;
-    border-right: 1px solid rgba(255,255,255,0.07);
+    background: #090e1d;
+    border-right: 1px solid rgba(148,163,184,0.14);
 }
 
 [data-testid="stSidebar"] > div {
-    padding-top: 25px;
+    padding: 24px 20px;
 }
 
 
 /* Brand */
 
-.brand {
-    font-size: 25px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    margin-bottom: 5px;
+.brand-box {
+    padding: 4px 0 22px 0;
 }
 
-.brand-gradient {
+.brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 25px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #4f46e5
+        );
+
+    box-shadow:
+        0 8px 25px rgba(124,58,237,0.35);
+}
+
+.brand-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.brand-description {
+    color: #8b95aa;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+
+/* Navigation */
+
+.section-label {
+    color: #68738a;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    margin: 20px 0 9px 2px;
+}
+
+
+/* Sidebar buttons */
+
+[data-testid="stSidebar"] .stButton > button {
+    width: 100%;
+    min-height: 42px;
+
+    border-radius: 10px;
+
+    border: 1px solid transparent;
+
+    background: transparent;
+
+    color: #d7dce8;
+
+    text-align: left;
+
+    font-weight: 500;
+}
+
+
+[data-testid="stSidebar"] .stButton > button:hover {
+    background: rgba(124,58,237,0.14);
+    border-color: rgba(124,58,237,0.20);
+}
+
+
+/* =====================================================
+   PREMIUM CARD
+   ===================================================== */
+
+.premium-card {
+    margin-top: 25px;
+
+    padding: 18px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(124,58,237,0.24),
+            rgba(79,70,229,0.08)
+        );
+
+    border: 1px solid rgba(139,92,246,0.28);
+}
+
+.premium-title {
+    color: #c084fc;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.premium-text {
+    color: #aab2c3;
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 8px 0 14px;
+}
+
+
+/* =====================================================
+   PROFILE
+   ===================================================== */
+
+.profile-card {
+    margin-top: 22px;
+    padding-top: 18px;
+
+    border-top: 1px solid rgba(148,163,184,0.12);
+}
+
+.profile-avatar {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #4f46e5,
+        #7c3aed
+    );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 800;
+    color: white;
+}
+
+.profile-name {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.profile-plan {
+    color: #7f899d;
+    font-size: 10px;
+}
+
+
+/* =====================================================
+   MAIN HEADER
+   ===================================================== */
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.greeting {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.greeting-name {
     background: linear-gradient(
         90deg,
-        #818cf8,
-        #c084fc
+        #8b5cf6,
+        #a78bfa
     );
 
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.brand-subtitle {
-    color: #7c849d;
-    font-size: 12px;
-    margin-bottom: 30px;
+.header-subtitle {
+    color: #8791a7;
+    font-size: 14px;
+    margin-top: 4px;
 }
 
 
-/* Navigation */
+/* Date card */
 
-.nav-title {
-    color: #667085;
+.date-card {
+    min-width: 155px;
+
+    padding: 14px 18px;
+
+    border-radius: 14px;
+
+    background: rgba(15,23,42,0.8);
+
+    border: 1px solid rgba(148,163,184,0.12);
+
+    text-align: center;
+}
+
+.date-icon {
+    font-size: 18px;
+}
+
+.date-text {
+    font-size: 12px;
+    color: #d9deea;
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   STAT CARDS
+   ===================================================== */
+
+.stat-card {
+    min-height: 160px;
+
+    padding: 20px;
+
+    border-radius: 17px;
+
+    background: #0d1425;
+
+    border: 1px solid rgba(148,163,184,0.13);
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    transition: 0.2s;
+}
+
+.stat-purple {
+    border-color: rgba(168,85,247,0.30);
+}
+
+.stat-blue {
+    border-color: rgba(59,130,246,0.28);
+}
+
+.stat-green {
+    border-color: rgba(34,197,94,0.25);
+}
+
+.stat-orange {
+    border-color: rgba(245,158,11,0.27);
+}
+
+.stat-icon {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+
+    margin-bottom: 16px;
+}
+
+.icon-purple {
+    background: rgba(168,85,247,0.15);
+}
+
+.icon-blue {
+    background: rgba(59,130,246,0.15);
+}
+
+.icon-green {
+    background: rgba(34,197,94,0.13);
+}
+
+.icon-orange {
+    background: rgba(245,158,11,0.13);
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.stat-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.stat-description {
+    color: #758096;
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+
+/* =====================================================
+   CHAT PANEL
+   ===================================================== */
+
+.chat-panel {
+    margin-top: 25px;
+
+    border-radius: 18px;
+
+    background: #0b1120;
+
+    border: 1px solid rgba(148,163,184,0.14);
+
+    overflow: hidden;
+}
+
+.chat-header {
+    padding: 20px 24px;
+
+    border-bottom: 1px solid rgba(148,163,184,0.10);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chat-title {
+    font-size: 20px;
+    font-weight: 750;
+}
+
+.chat-subtitle {
+    color: #7f899e;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+
+/* =====================================================
+   CHAT MESSAGES
+   ===================================================== */
+
+.stChatMessage {
+    border-radius: 15px;
+
+    border: 1px solid rgba(148,163,184,0.10);
+
+    background: rgba(255,255,255,0.025);
+
     margin-bottom: 10px;
 }
 
 
-/* Dashboard title */
-
-.dashboard-title {
-    font-size: 42px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    margin-bottom: 5px;
-}
-
-.dashboard-subtitle {
-    color: #8992aa;
-    font-size: 16px;
-    margin-bottom: 30px;
-}
-
-
-/* Cards */
-
-.card {
-    background: rgba(255,255,255,0.045);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 25px;
-    min-height: 145px;
-    box-shadow:
-        0 15px 40px rgba(0,0,0,0.18);
-}
-
-.card:hover {
-    border-color: rgba(129,140,248,0.35);
-}
-
-.card-icon {
-    font-size: 28px;
-    margin-bottom: 15px;
-}
-
-.card-title {
-    font-size: 17px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.card-text {
-    color: #8992aa;
-    font-size: 13px;
-}
-
-
-/* Stats */
-
-.stat-card {
-    background: linear-gradient(
-        135deg,
-        rgba(99,102,241,0.16),
-        rgba(168,85,247,0.10)
-    );
-
-    border: 1px solid rgba(129,140,248,0.18);
-    border-radius: 18px;
-    padding: 20px;
-}
-
-.stat-number {
-    font-size: 30px;
-    font-weight: 800;
-}
-
-.stat-label {
-    color: #8992aa;
-    font-size: 13px;
-}
-
-
-/* Chat */
-
-.stChatMessage {
-    background: rgba(255,255,255,0.045);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 18px;
-    padding: 14px;
-    margin-bottom: 12px;
-}
-
-
-/* Chat input */
+/* =====================================================
+   CHAT INPUT
+   ===================================================== */
 
 .stChatInputContainer {
-    background: #111625;
-    border: 1px solid rgba(129,140,248,0.3);
-    border-radius: 18px;
+    background: #111827;
+
+    border: 1px solid rgba(129,140,248,0.30);
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.22);
 }
 
 
-/* Buttons */
+/* =====================================================
+   BUTTONS
+   ===================================================== */
 
 .stButton > button {
-    width: 100%;
-    border-radius: 12px;
-    border: 1px solid rgba(129,140,248,0.2);
-    background: rgba(255,255,255,0.04);
-    color: white;
+    border-radius: 10px;
+
+    background: #111827;
+
+    color: #e5e7eb;
+
+    border: 1px solid rgba(148,163,184,0.15);
+
     font-weight: 600;
-    padding: 10px;
 }
 
 .stButton > button:hover {
+    border-color: #7c3aed;
+
+    background: rgba(124,58,237,0.15);
+}
+
+
+/* Purple buttons */
+
+.purple-button .stButton > button {
     background: linear-gradient(
         135deg,
-        #4f46e5,
+        #6d28d9,
         #7c3aed
     );
 
-    border-color: transparent;
+    border: none;
+
+    color: white;
 }
 
 
-/* Primary button */
+/* =====================================================
+   FOOTER
+   ===================================================== */
 
-.primary-button button {
-    background: linear-gradient(
-        135deg,
-        #4f46e5,
-        #7c3aed
-    ) !important;
-
-    border: none !important;
-}
-
-
-/* Divider */
-
-.divider {
-    height: 1px;
-    background: rgba(255,255,255,0.07);
-    margin: 25px 0;
-}
-
-
-/* Welcome */
-
-.welcome {
+.footer {
     text-align: center;
-    padding: 45px 20px 25px;
-}
 
-.welcome-icon {
-    font-size: 55px;
-}
+    color: #5f687c;
 
-.welcome-title {
-    font-size: 34px;
-    font-weight: 800;
-    margin-top: 10px;
-}
+    font-size: 10px;
 
-.welcome-text {
-    color: #8992aa;
-    font-size: 15px;
-}
-
-
-/* Footer */
-
-.custom-footer {
-    text-align: center;
-    color: #555e75;
-    font-size: 11px;
-    margin-top: 40px;
+    margin: 20px 0;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 
-# ==================================================
+# =========================================================
 # SIDEBAR
-# ==================================================
+# =========================================================
 
 with st.sidebar:
 
-    st.markdown(
-        """
-        <div class="brand">
-            🤖 <span class="brand-gradient">Danish AI</span>
-        </div>
+    st.markdown("""
+    <div class="brand-box">
+        <div class="brand-row">
+            <div class="brand-logo">🤖</div>
 
-        <div class="brand-subtitle">
-            Your intelligent AI assistant
+            <div>
+                <div class="brand-name">Danish AI</div>
+                <div class="brand-description">
+                    Your Intelligent AI Assistant
+                </div>
+            </div>
         </div>
-        """,
+    </div>
+    """, unsafe_allow_html=True)
+
+
+    st.markdown(
+        '<div class="section-label">Workspace</div>',
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        '<div class="nav-title">Workspace</div>',
-        unsafe_allow_html=True
-    )
 
-    if st.button("🏠  Dashboard"):
+    if st.button("🏠   Dashboard"):
         st.session_state.page = "Dashboard"
         st.rerun()
 
-    if st.button("💬  AI Chat"):
+
+    if st.button("💬   AI Chat"):
         st.session_state.page = "Chat"
         st.rerun()
 
-    if st.button("📊  Usage & Stats"):
+
+    if st.button("📊   Usage & Stats"):
         st.session_state.page = "Stats"
         st.rerun()
 
-    if st.button("⚙️  Settings"):
+
+    if st.button("⚙️   Settings"):
         st.session_state.page = "Settings"
         st.rerun()
 
-    st.markdown("<br>", unsafe_allow_html=True)
 
     st.markdown(
-        '<div class="nav-title">Chat</div>',
+        '<div class="section-label">Chat</div>',
         unsafe_allow_html=True
     )
 
-    if st.button("🗑️  Clear Conversation"):
+
+    if st.button("🗑️   Clear Conversation"):
+
         st.session_state.messages = [
             {
                 "role": "system",
@@ -382,208 +623,413 @@ with st.sidebar:
 
         st.rerun()
 
-    st.markdown("---")
 
-    st.caption("Danish AI")
-    st.caption("© 2026 Danish AI")
+    # Premium card
+
+    st.markdown("""
+    <div class="premium-card">
+        <div class="premium-title">
+            👑 Danish AI Premium
+        </div>
+
+        <div class="premium-text">
+            Unlock more power and exclusive features.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
-# ==================================================
+    st.markdown(
+        '<div class="purple-button">',
+        unsafe_allow_html=True
+    )
+
+    if st.button("Upgrade Now"):
+        st.info("Premium plans coming soon.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+    # Profile
+
+    st.markdown("""
+    <div class="profile-card">
+        <div class="brand-row">
+            <div class="profile-avatar">D</div>
+
+            <div>
+                <div class="profile-name">
+                    Danish
+                </div>
+
+                <div class="profile-plan">
+                    Free Plan
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# =========================================================
 # DASHBOARD
-# ==================================================
+# =========================================================
 
 if st.session_state.page == "Dashboard":
 
-    st.markdown(
-        '<div class="dashboard-title">Welcome to Danish AI 👋</div>',
-        unsafe_allow_html=True
-    )
+    now = datetime.now()
 
-    st.markdown(
-        '<div class="dashboard-subtitle">Your personal intelligent AI workspace.</div>',
-        unsafe_allow_html=True
-    )
+    today = now.strftime("%B %d, %Y")
+    current_time = now.strftime("%I:%M %p")
 
 
-    # Stats row
+    # Header
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns([5, 1.2])
 
     with col1:
+
         st.markdown(
             """
-            <div class="stat-card">
-                <div class="stat-number">🤖</div>
-                <div class="stat-label">AI Assistant</div>
+            <div class="greeting">
+                Good evening,
+                <span class="greeting-name">
+                    Danish
+                </span>
+                👋
+            </div>
+
+            <div class="header-subtitle">
+                Here's what's happening with Danish AI today.
             </div>
             """,
             unsafe_allow_html=True
         )
 
+
     with col2:
+
         st.markdown(
             f"""
-            <div class="stat-card">
+            <div class="date-card">
+                <div class="date-icon">📅</div>
+                <div class="date-text">
+                    {today}
+                </div>
+                <div class="date-text">
+                    {current_time}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+    # =====================================================
+    # STATS
+    # =====================================================
+
+    user_messages = [
+        m for m in st.session_state.messages
+        if m["role"] == "user"
+    ]
+
+    assistant_messages = [
+        m for m in st.session_state.messages
+        if m["role"] == "assistant"
+    ]
+
+
+    total_messages = (
+        len(user_messages) +
+        len(assistant_messages)
+    )
+
+
+    c1, c2, c3, c4 = st.columns(4)
+
+
+    with c1:
+
+        st.markdown(
+            f"""
+            <div class="stat-card stat-purple">
+
+                <div class="stat-icon icon-purple">
+                    💬
+                </div>
+
                 <div class="stat-number">
-                    {len(st.session_state.messages) - 1}
+                    {total_messages}
                 </div>
-                <div class="stat-label">Messages</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
 
-    with col3:
-        st.markdown(
-            """
-            <div class="stat-card">
-                <div class="stat-number">EN / اردو</div>
-                <div class="stat-label">Languages</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                <div class="stat-title">
+                    Messages
+                </div>
 
-    with col4:
-        st.markdown(
-            """
-            <div class="stat-card">
-                <div class="stat-number">🔥</div>
-                <div class="stat-label">Roast Mode</div>
+                <div class="stat-description">
+                    Total messages
+                </div>
+
             </div>
             """,
             unsafe_allow_html=True
         )
 
 
-    st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+    with c2:
 
-    st.markdown("### What can Danish AI do?")
+        st.markdown(
+            f"""
+            <div class="stat-card stat-blue">
+
+                <div class="stat-icon icon-blue">
+                    👤
+                </div>
+
+                <div class="stat-number">
+                    {len(user_messages)}
+                </div>
+
+                <div class="stat-title">
+                    Questions
+                </div>
+
+                <div class="stat-description">
+                    Asked by you
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 
-    col1, col2, col3 = st.columns(3)
+    with c3:
 
-    with col1:
+        st.markdown(
+            f"""
+            <div class="stat-card stat-green">
+
+                <div class="stat-icon icon-green">
+                    🤖
+                </div>
+
+                <div class="stat-number">
+                    {len(assistant_messages)}
+                </div>
+
+                <div class="stat-title">
+                    AI Responses
+                </div>
+
+                <div class="stat-description">
+                    From Danish AI
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+    with c4:
+
         st.markdown(
             """
-            <div class="card">
-                <div class="card-icon">💬</div>
-                <div class="card-title">AI Conversations</div>
-                <div class="card-text">
-                    Ask questions, brainstorm ideas,
-                    learn new topics and get intelligent answers.
+            <div class="stat-card stat-orange">
+
+                <div class="stat-icon icon-orange">
+                    🔥
+                </div>
+
+                <div class="stat-number">
+                    0
+                </div>
+
+                <div class="stat-title">
+                    Roast Mode
+                </div>
+
+                <div class="stat-description">
+                    Funny roasts
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+    # =====================================================
+    # CHAT PANEL HEADER
+    # =====================================================
+
+    st.markdown("""
+    <div class="chat-panel">
+
+        <div class="chat-header">
+
+            <div>
+                <div class="chat-title">
+                    💬 AI Chat
+                </div>
+
+                <div class="chat-subtitle">
+                    Talk with Danish AI.
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
 
-    with col2:
-        st.markdown(
-            """
-            <div class="card">
-                <div class="card-icon">🧠</div>
-                <div class="card-title">Smart Assistance</div>
-                <div class="card-text">
-                    Get help with coding, writing,
-                    learning, business and everyday tasks.
-                </div>
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
+    # New chat button
+
+    new_chat_col, empty_col = st.columns([1, 5])
+
+    with new_chat_col:
+
+        if st.button("➕ New Chat"):
+
+            st.session_state.messages = [
+                {
+                    "role": "system",
+                    "content": SYSTEM_PROMPT
+                }
+            ]
+
+            st.rerun()
+
+
+    # =====================================================
+    # CHAT
+    # =====================================================
+
+    if len(st.session_state.messages) == 1:
+
+        st.markdown("""
+        <div style="
+            text-align:center;
+            padding:45px 20px 25px;
+        ">
+
+            <div style="
+                font-size:52px;
+            ">
+                🤖
             </div>
-            """,
-            unsafe_allow_html=True
-        )
 
-    with col3:
-        st.markdown(
-            """
-            <div class="card">
-                <div class="card-icon">🇵🇰</div>
-                <div class="card-title">English + Urdu</div>
-                <div class="card-text">
-                    Communicate naturally in English
-                    or Urdu depending on your preference.
-                </div>
+            <div style="
+                font-size:30px;
+                font-weight:800;
+                margin-top:10px;
+            ">
+                How can I help you today?
             </div>
-            """,
-            unsafe_allow_html=True
-        )
 
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-
-        st.markdown(
-            """
-            <div class="card">
-                <div class="card-icon">🚀</div>
-                <div class="card-title">Ready to get started?</div>
-                <div class="card-text">
-                    Open AI Chat and start a conversation
-                    with Danish AI.
-                </div>
+            <div style="
+                color:#7f899e;
+                font-size:13px;
+                margin-top:8px;
+            ">
+                Ask me anything or start a conversation.
             </div>
-            """,
-            unsafe_allow_html=True
+
+        </div>
+        """, unsafe_allow_html=True)
+
+
+    else:
+
+        for message in st.session_state.messages:
+
+            if message["role"] == "system":
+                continue
+
+            with st.chat_message(message["role"]):
+
+                st.markdown(message["content"])
+
+
+    # =====================================================
+    # CHAT INPUT
+    # =====================================================
+
+    user_input = st.chat_input(
+        "Type your message..."
+    )
+
+
+    if user_input:
+
+        st.session_state.messages.append(
+            {
+                "role": "user",
+                "content": user_input
+            }
         )
 
-    with col2:
 
-        st.markdown(
-            """
-            <div class="card">
-                <div class="card-icon">✨</div>
-                <div class="card-title">Built for Danish AI</div>
-                <div class="card-text">
-                    A custom AI experience with its own
-                    visual identity and dashboard.
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        with st.chat_message("user"):
+
+            st.markdown(user_input)
 
 
-# ==================================================
-# CHAT
-# ==================================================
+        with st.chat_message("assistant"):
+
+            with st.spinner("Danish AI is thinking..."):
+
+                try:
+
+                    response = client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=st.session_state.messages
+                    )
+
+                    answer = (
+                        response
+                        .choices[0]
+                        .message
+                        .content
+                    )
+
+                    st.markdown(answer)
+
+
+                    st.session_state.messages.append(
+                        {
+                            "role": "assistant",
+                            "content": answer
+                        }
+                    )
+
+
+                except Exception as e:
+
+                    st.error(
+                        "Something went wrong. Please try again."
+                    )
+
+
+# =========================================================
+# AI CHAT PAGE
+# =========================================================
 
 elif st.session_state.page == "Chat":
 
     st.markdown(
-        '<div class="dashboard-title">AI Chat 💬</div>',
+        '<div class="greeting">AI Chat 💬</div>',
         unsafe_allow_html=True
     )
 
     st.markdown(
-        '<div class="dashboard-subtitle">Talk with Danish AI.</div>',
+        '<div class="header-subtitle">Talk with Danish AI.</div>',
         unsafe_allow_html=True
     )
 
-
-    # Welcome message when chat is empty
-
-    if len(st.session_state.messages) == 1:
-
-        st.markdown(
-            """
-            <div class="welcome">
-                <div class="welcome-icon">🤖</div>
-                <div class="welcome-title">
-                    How can I help you?
-                </div>
-                <div class="welcome-text">
-                    Ask Danish AI anything.
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-
-    # Display messages
 
     for message in st.session_state.messages:
 
@@ -594,10 +1040,8 @@ elif st.session_state.page == "Chat":
             st.markdown(message["content"])
 
 
-    # Chat input
-
     user_input = st.chat_input(
-        "Message Danish AI..."
+        "Type your message..."
     )
 
 
@@ -618,166 +1062,139 @@ elif st.session_state.page == "Chat":
 
             with st.spinner("Danish AI is thinking..."):
 
-                try:
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=st.session_state.messages
+                )
 
-                    response = client.chat.completions.create(
-                        model="gpt-4o-mini",
-                        messages=st.session_state.messages
-                    )
+                answer = response.choices[0].message.content
 
-                    answer = response.choices[0].message.content
-
-                    st.markdown(answer)
-
-                    st.session_state.messages.append(
-                        {
-                            "role": "assistant",
-                            "content": answer
-                        }
-                    )
-
-                except Exception:
-
-                    st.error(
-                        "Sorry, something went wrong. Please try again."
-                    )
+                st.markdown(answer)
 
 
-# ==================================================
-# STATS
-# ==================================================
+        st.session_state.messages.append(
+            {
+                "role": "assistant",
+                "content": answer
+            }
+        )
+
+
+# =========================================================
+# STATS PAGE
+# =========================================================
 
 elif st.session_state.page == "Stats":
 
     st.markdown(
-        '<div class="dashboard-title">Usage & Stats 📊</div>',
+        '<div class="greeting">Usage & Stats 📊</div>',
         unsafe_allow_html=True
     )
 
     st.markdown(
-        '<div class="dashboard-subtitle">Your Danish AI activity.</div>',
+        '<div class="header-subtitle">Your Danish AI activity.</div>',
         unsafe_allow_html=True
     )
 
 
-    user_messages = [
+    user_count = len([
         m for m in st.session_state.messages
         if m["role"] == "user"
-    ]
+    ])
 
-    assistant_messages = [
+    ai_count = len([
         m for m in st.session_state.messages
         if m["role"] == "assistant"
-    ]
+    ])
 
 
-    col1, col2, col3 = st.columns(3)
+    c1, c2, c3 = st.columns(3)
 
-    with col1:
 
-        st.markdown(
-            f"""
-            <div class="stat-card">
-                <div class="stat-number">
-                    {len(user_messages)}
-                </div>
-                <div class="stat-label">
-                    Questions Asked
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    with col2:
-
-        st.markdown(
-            f"""
-            <div class="stat-card">
-                <div class="stat-number">
-                    {len(assistant_messages)}
-                </div>
-                <div class="stat-label">
-                    AI Responses
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    with col3:
-
-        st.markdown(
-            """
-            <div class="stat-card">
-                <div class="stat-number">
-                    Active
-                </div>
-                <div class="stat-label">
-                    AI Status
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
+    with c1:
+        st.metric(
+            "Questions",
+            user_count
         )
 
 
-# ==================================================
-# SETTINGS
-# ==================================================
+    with c2:
+        st.metric(
+            "AI Responses",
+            ai_count
+        )
+
+
+    with c3:
+        st.metric(
+            "Total Messages",
+            user_count + ai_count
+        )
+
+
+# =========================================================
+# SETTINGS PAGE
+# =========================================================
 
 elif st.session_state.page == "Settings":
 
     st.markdown(
-        '<div class="dashboard-title">Settings ⚙️</div>',
+        '<div class="greeting">Settings ⚙️</div>',
         unsafe_allow_html=True
     )
 
     st.markdown(
-        '<div class="dashboard-subtitle">Customize your Danish AI experience.</div>',
+        '<div class="header-subtitle">Customize Danish AI.</div>',
         unsafe_allow_html=True
     )
 
 
-    st.markdown(
-        """
-        <div class="card">
-            <div class="card-icon">🤖</div>
-            <div class="card-title">Danish AI</div>
-            <div class="card-text">
-                Personal AI assistant powered by OpenAI.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.markdown("### Preferences")
+
+
+    language = st.selectbox(
+        "Language",
+        [
+            "Automatic",
+            "English",
+            "Urdu"
+        ]
     )
 
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    st.write("### Language")
-
-    st.selectbox(
-        "Preferred language",
-        ["Automatic", "English", "Urdu"]
-    )
-
-    st.write("### Appearance")
-
-    st.selectbox(
+    theme = st.selectbox(
         "Theme",
-        ["Danish Dark", "System"]
+        [
+            "Danish Dark",
+            "System"
+        ]
     )
 
 
-# ==================================================
+    st.markdown("### AI Features")
+
+
+    roast = st.toggle(
+        "🔥 Roast Mode",
+        value=False
+    )
+
+
+    st.markdown("### About Danish AI")
+
+    st.info(
+        "Danish AI is your intelligent AI assistant."
+    )
+
+
+# =========================================================
 # FOOTER
-# ==================================================
+# =========================================================
 
 st.markdown(
     """
-    <div class="custom-footer">
-        Danish AI • Your Intelligent AI Assistant
+    <div class="footer">
+        Danish AI • Your Intelligent AI Assistant ♡
     </div>
     """,
     unsafe_allow_html=True
