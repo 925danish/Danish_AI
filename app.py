@@ -45,7 +45,11 @@ st.markdown("""
 
 /* Chat input */
 .stChatInputContainer {
-    border-radius: 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(129,140,248,0.35);
+    background: rgba(15,23,42,0.85);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+}
 }
 
 /* Sidebar */
