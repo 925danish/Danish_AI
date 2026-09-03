@@ -65,16 +65,19 @@ st.markdown("""
 
 /* Buttons */
 .stButton > button {
-    border-radius: 12px;
-    border: 1px solid rgba(165,180,252,0.3);
-    background: rgba(99,102,241,0.15);
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(129,140,248,0.35);
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: white;
-    font-weight: 600;
+    font-weight: 700;
+    padding: 10px;
+    transition: 0.2s;
 }
 
 .stButton > button:hover {
-    border-color: #818cf8;
-    background: rgba(99,102,241,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99,102,241,0.35);
 }
 
 /* Hide Streamlit branding */
